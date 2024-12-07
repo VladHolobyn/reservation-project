@@ -1,10 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { RegistrationDto } from './dto/create-user.dto';
 import { UserDto } from './dto/user.dto';
 import { EntityManager, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import { LoginDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +15,7 @@ export class AuthService {
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
         private readonly entityManager: EntityManager,
+        private readonly jwtService: JwtService,
     ) {}
 
     async registerUser(dto: RegistrationDto) {
@@ -27,6 +30,23 @@ export class AuthService {
 
         this.userRepository.save(newUser);
         // this.entityManager.save(newUser);
+    }
+
+    async login(dto: LoginDto): Promise<any> {
+        const user: User = await this.userRepository.findOneBy({email: dto.email})
+
+        if(!user) {
+            throw new UnauthorizedException("Bad credentials");
+        }
+
+        if(! await bcrypt.compare(dto.password, user.password)) {
+            throw new UnauthorizedException("Bad credentials");
+        }
+
+
+        return {
+            accessToken: this.jwtService.sign({userId: user.id}, {expiresIn: '1h'})
+        }  
     }
 
     async findById(id: number): Promise<UserDto> {
