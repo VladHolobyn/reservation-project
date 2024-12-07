@@ -14,6 +14,9 @@ export class User {
     @Column({name: "last_name"})
     lastName: string
 
+    @Column()
+    password: string
+
     constructor(user: Partial<User>) {
         Object.assign(this, user);
     }
