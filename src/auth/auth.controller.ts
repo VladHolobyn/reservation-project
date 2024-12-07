@@ -1,7 +1,8 @@
-import { Body, Param, Controller, Post, Get } from '@nestjs/common';
+import { Body, Param, Controller, Post, Get, UseGuards, Req, Logger } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegistrationDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
+import { AuthGuard } from './guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -21,7 +22,9 @@ export class AuthController {
     }
 
     @Get('users/:id')
-    async findOne(@Param('id') id:string) {
+    @UseGuards(AuthGuard)
+    findOne(@Param('id') id:string, @Req() request) {
+        Logger.debug(request.userId);
         return this.authService.findById(+id);
     }
 }
