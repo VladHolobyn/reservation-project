@@ -1,26 +1,30 @@
-import { Body, Param, Controller, Post, Get } from '@nestjs/common';
+import { Body, Param, Controller, Post, Get, UseGuards, Req, Logger } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { RegistrationDto } from './dto/create-user.dto';
+import { LoginDto } from './dto/login.dto';
+import { AuthGuard } from './guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
 
     constructor(
         private readonly authService: AuthService
-    ) {}
-    
-    @Post('login')
-    login(){
-        return "login";
-    }
+    ) {}    
 
     @Post('register')
-    register(@Body() createDto: CreateUserDto) {
-        return this.authService.createUser(createDto);
+    register(@Body() registrationDto: RegistrationDto) {
+        return this.authService.registerUser(registrationDto);
+    }
+    
+    @Post('login')
+    login(@Body() loginDto: LoginDto){
+        return this.authService.login(loginDto);
     }
 
     @Get('users/:id')
-    async findOne(@Param('id') id:string) {
+    @UseGuards(AuthGuard)
+    findOne(@Param('id') id:string, @Req() request) {
+        Logger.debug(request.userId);
         return this.authService.findById(+id);
     }
 }
