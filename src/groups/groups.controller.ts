@@ -40,8 +40,8 @@ export class GroupsController {
 
   @Get('involved')
   @UseGuards(AuthGuard)
-  findInvolved() {
-    return "find all involved groups";
+  findInvolved(@Paginate() query: PaginateQuery, @Req() request) {
+    return this.groupService.findEnrolledGroups(query, request.userId);
   }
 
   @Get(':id')

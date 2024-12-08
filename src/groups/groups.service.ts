@@ -3,7 +3,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateGroupDto } from './dto/create-group.dto';
 import { Group } from './entity/group.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { ArrayContains, In, Repository } from 'typeorm';
 import { FilterOperator, paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 import { GroupShortDto } from './dto/group-short.dto';
 import { plainToInstance } from 'class-transformer';
@@ -15,7 +15,6 @@ import { group } from 'console';
 
 @Injectable()
 export class GroupsService {
-
 
   constructor(
     @InjectRepository(Group)
@@ -140,6 +139,27 @@ export class GroupsService {
                 state: MembershipState.INVITED
             }
         }).then(data => data.map(entity =>  plainToInstance(InvitationDto, entity, {excludeExtraneousValues: true}) ))
+    }
+
+    async findEnrolledGroups(query: PaginateQuery, userId: number) {
+        const pagable = await paginate(query, this.groupRepository, {
+            sortableColumns: ['id'],
+            searchableColumns: ['name'],
+            filterableColumns: {
+              name: [FilterOperator.ILIKE],
+            },
+            relations: ['owner', 'members'],
+            where: {members: {userId, state: MembershipState.ACCEPTED}}
+          });
+    
+        return {
+          ...pagable,
+          data: pagable.data.map((entity) =>
+            plainToInstance(GroupShortDto, entity, {
+                excludeExtraneousValues: true,
+              })
+          ),
+        };
     }
 
     async deleteMember(id: number, userId: number) {
