@@ -11,7 +11,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { GroupMember } from './entity/group-member.entity';
 import { MembershipState } from './entity/membership-state.enum';
 import { InvitationDto } from './dto/invitation.dto';
-import { group } from 'console';
+import { GroupFullDto } from './dto/group-full.dto';
 
 @Injectable()
 export class GroupsService {
@@ -72,17 +72,27 @@ export class GroupsService {
     };
   }
 
-//   async findAllGroupsManagedBy(ownerId: number): Promise<GroupShortDto[]> {
-//     const list = await this.groupRepository.find({
-//         relations: ['owner'],
-//         where: {ownerId},
+  async findById(id: number, userId: number) {
+    const group: Group = await this.groupRepository.findOne({
+      relations: {
+        members: {
+          user:true
+        }
+      },
+      where: {
+        id,ownerId:userId, members: {state: MembershipState.ACCEPTED}
+      }
+    })
 
-//     });
 
-//     return list.map(entity => plainToInstance(GroupShortDto, entity, {
-//         excludeExtraneousValues: true,
-//       }));
-//   }
+    if(!group) {
+      throw new NotFoundException(`Group with id: ${id} does not exist`);
+    }
+
+    return plainToInstance(GroupFullDto, group, {
+      excludeExtraneousValues: true,
+    })
+  }
 
 
     async invite(invitationDto: CreateInvitationDto, ownerId: number) {

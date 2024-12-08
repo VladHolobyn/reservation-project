@@ -46,8 +46,8 @@ export class GroupsController {
 
   @Get(':id')
   @UseGuards(AuthGuard)
-  findOne(@Param('id') id: string) {
-    return "find id: " + id;
+  findOne(@Param('id') id: number, @Req() request) {
+    return this.groupService.findById(id, request.userId);
   }
 
 
