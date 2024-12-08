@@ -1,12 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { GroupsService } from './groups.service';
+import { CreateGroupDto } from './dto/create-group.dto';
 
 @Controller('groups')
 export class GroupsController {
-  constructor() {}
+  constructor(
+    private readonly groupService: GroupsService
+  ) {}
 
   @Post()
-  create() {
-    return "create a group";
+  @UseGuards(AuthGuard)
+  create(@Body() createGroupDto: CreateGroupDto, @Req() request) {
+    return this.groupService.createGroup(createGroupDto, request.userId);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string) {
+    return "update id: " + id;
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return "delete id: " + id;
   }
 
   @Get('managed')
@@ -24,15 +40,7 @@ export class GroupsController {
     return "find id: " + id;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string) {
-    return "update id: " + id;
-  }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return "delete id: " + id;
-  }
 
   @Post('members')
   addMember(){
