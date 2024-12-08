@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } fro
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './dto/create-group.dto';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
 
 @Controller('groups')
 export class GroupsController {
@@ -28,8 +29,8 @@ export class GroupsController {
   }
 
   @Get()
-  getAll() {
-    return "find id: ";
+  getAll(@Paginate() query: PaginateQuery) {
+    return this.groupService.findAll(query);
   }
 
 

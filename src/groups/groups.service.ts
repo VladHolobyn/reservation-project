@@ -3,6 +3,10 @@ import { CreateGroupDto } from './dto/create-group.dto';
 import { Group } from './entity/group.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { FilterOperator, paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
+import { GroupShortDto } from './dto/group-short.dto';
+import { instanceToInstance, plainToClass, plainToInstance } from 'class-transformer';
+import { log } from 'console';
 
 @Injectable()
 export class GroupsService {
@@ -33,6 +37,7 @@ export class GroupsService {
 
     Object.assign(group, createGroupDto)
     this.groupRepository.save(group);
+    this.groupRepository.find
   }
 
   async deleteGroup(id: number, ownerId: number) {
@@ -47,6 +52,29 @@ export class GroupsService {
     }
 
     // TODO: check for members
-    this.groupRepository.delete(group)
+    this.groupRepository.delete(group);
   }
+
+
+  async findAll(query: PaginateQuery) {
+    const pagable = await paginate(query, this.groupRepository, {
+        sortableColumns: ['id'],
+        searchableColumns: ['name', 'ownerId'],
+        filterableColumns: {
+          name: [FilterOperator.ILIKE],
+          ownerId: [FilterOperator.EQ]
+        },
+        relations: ['owner']
+      });
+
+    return {
+      ...pagable,
+      data: pagable.data.map((entity) =>
+        plainToInstance(GroupShortDto, entity, {
+            excludeExtraneousValues: true,
+          })
+      ),
+    };
+  }
+
 }
