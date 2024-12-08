@@ -23,9 +23,15 @@ export class GroupsController {
 
   @Delete(':id')
   @UseGuards(AuthGuard)
-  remove(@Param('id') id: string) {
-    return "delete id: " + id;
+  remove(@Param('id') id: number, @Req() request) {
+    return this.groupService.deleteGroup(id, request.userId);
   }
+
+  @Get()
+  getAll() {
+    return "find id: ";
+  }
+
 
   @Get('managed')
   findManaged() {

@@ -3,7 +3,6 @@ import { CreateGroupDto } from './dto/create-group.dto';
 import { Group } from './entity/group.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { log } from 'console';
 
 @Injectable()
 export class GroupsService {
@@ -34,5 +33,20 @@ export class GroupsService {
 
     Object.assign(group, createGroupDto)
     this.groupRepository.save(group);
+  }
+
+  async deleteGroup(id: number, ownerId: number) {
+    const group: Group = await this.groupRepository.findOneBy({ id });
+
+    if(!group) {
+        throw new NotFoundException(`Group with id: ${id} does not exist`);
+    }
+
+    if(ownerId !== group.ownerId) {
+        throw new BadRequestException(`You are not an owner of this group`);
+    }
+
+    // TODO: check for members
+    this.groupRepository.delete(group)
   }
 }
