@@ -11,9 +11,11 @@ import { AuthService } from 'src/auth/auth.service';
 import { GroupMember } from './entity/group-member.entity';
 import { MembershipState } from './entity/membership-state.enum';
 import { InvitationDto } from './dto/invitation.dto';
+import { group } from 'console';
 
 @Injectable()
 export class GroupsService {
+
 
   constructor(
     @InjectRepository(Group)
@@ -140,7 +142,21 @@ export class GroupsService {
         }).then(data => data.map(entity =>  plainToInstance(InvitationDto, entity, {excludeExtraneousValues: true}) ))
     }
 
+    async deleteMember(id: number, userId: number) {
+        const member: GroupMember = await this.groupMemberRepository.findOne({
+            relations: {group: true},
+            where: {id, state: MembershipState.ACCEPTED}
+        });
 
+        if(!member || member.group.ownerId !== userId) {
+            throw new NotFoundException(`There is no such invitation`);
+        }
+
+        // TODO: check for active slots
+
+        member.state = MembershipState.DEACTIVATED;
+        this.groupMemberRepository.update({id},member);
+    }
 
 
 

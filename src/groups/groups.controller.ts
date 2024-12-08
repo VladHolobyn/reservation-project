@@ -70,10 +70,10 @@ export class GroupsController {
     return this.groupService.declineInvitation(id, request.userId);
   }
 
-  @Delete('members')
+  @Delete('members/:id')
   @UseGuards(AuthGuard)
-  deleteMember(@Param('id') id:number) {
-    return "delete member: "+id;
+  deleteMember(@Param('id') id: number, @Req() request) {
+    return this.groupService.deleteMember(id, request.userId);
   }
 
   @Get('members/invitations')
