@@ -3,6 +3,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
+import { InvitationDto } from './dto/invitation.dto';
 
 @Controller('groups')
 export class GroupsController {
@@ -29,32 +30,35 @@ export class GroupsController {
   }
 
   @Get()
+  @UseGuards(AuthGuard)
   getAll(@Paginate() query: PaginateQuery) {
     return this.groupService.findAll(query);
   }
 
 
-  @Get('managed')
-  findManaged() {
-    return "find all managed groups";
+
+  @Post('members')
+  @UseGuards(AuthGuard)
+  addMember(@Body() invitationDto: InvitationDto, @Req() request){
+    return this.groupService.invite(invitationDto, request.userId);
   }
 
+
   @Get('involved')
+  @UseGuards(AuthGuard)
   findInvolved() {
     return "find all involved groups";
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard)
   findOne(@Param('id') id: string) {
     return "find id: " + id;
   }
 
 
 
-  @Post('members')
-  addMember(){
-    return "add member to the group";
-  }
+
 
   @Delete('members')
   deleteMember(@Param('id') id:string) {
