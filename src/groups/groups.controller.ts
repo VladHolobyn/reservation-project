@@ -16,11 +16,13 @@ export class GroupsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string) {
-    return "update id: " + id;
+  @UseGuards(AuthGuard)
+  update(@Param('id') id: number, @Body() createGroupDto: CreateGroupDto, @Req() request) {
+    return this.groupService.updateGroup(id, createGroupDto, request.userId);
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
   remove(@Param('id') id: string) {
     return "delete id: " + id;
   }
