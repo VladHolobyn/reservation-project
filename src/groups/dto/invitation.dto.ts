@@ -5,6 +5,7 @@ import { Timestamp } from "typeorm";
 import { MembershipState } from "../entity/membership-state.enum";
 
 export class InvitationDto {
+    @Expose() id: number
 
     @Type(()=> UserDto)
     @Expose() user: UserDto
@@ -14,5 +15,5 @@ export class InvitationDto {
 
     @Expose() state: MembershipState
 
-    @Expose() createdAt: Timestamp
+    @Expose() created: Timestamp
 }

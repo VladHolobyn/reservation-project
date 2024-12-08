@@ -106,7 +106,26 @@ export class GroupsService {
 
     }
 
-    async findUserInvitations(userId: any) {
+    async acceptInvitation(id: number, userId: number) {
+        await this.changeInvitationState(id, userId, MembershipState.ACCEPTED);
+    }
+
+    async declineInvitation(id: number, userId: number) {
+        await this.changeInvitationState(id, userId, MembershipState.DECLINED);
+    }
+
+    private async changeInvitationState(id: number, userId: number, state: MembershipState) {
+        const invitation: GroupMember= await this.groupMemberRepository.findOneBy({id, userId, state: MembershipState.INVITED});
+
+        if(!invitation) {
+            throw new NotFoundException(`There is no such invitation`);
+        }
+
+        invitation.state = state;
+        this.groupMemberRepository.update({id},invitation);
+    }
+
+    async findUserInvitations(userId: number) {
         return await this.groupMemberRepository.find({
             relations: {
                 user: true,

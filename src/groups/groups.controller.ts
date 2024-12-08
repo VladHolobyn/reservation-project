@@ -58,31 +58,26 @@ export class GroupsController {
     return this.groupService.invite(invitationDto, request.userId);
   }
 
-
-
-
-
-
-
-
-
-
-  @Delete('members')
-  deleteMember(@Param('id') id:string) {
-    return "delete member: "+id;
-  }
-
   @Post('members/:id/approve')
-  approveInvitation(@Param('id') id:string) {
-    return "approved "+id;
+  @UseGuards(AuthGuard)
+  approveInvitation(@Param('id') id: number, @Req() request) {
+    return this.groupService.acceptInvitation(id, request.userId);
   }
 
   @Post('members/:id/disapprove')
-  disapproveInvitation(@Param('id') id:string) {
-    return "disapproved "+id;
+  @UseGuards(AuthGuard)
+  disapproveInvitation(@Param('id') id: number, @Req() request) {
+    return this.groupService.declineInvitation(id, request.userId);
+  }
+
+  @Delete('members')
+  @UseGuards(AuthGuard)
+  deleteMember(@Param('id') id:number) {
+    return "delete member: "+id;
   }
 
   @Get('members/invitations')
+  @UseGuards(AuthGuard)
   findAllMyInvitations(@Req() request) {
     return this.groupService.findUserInvitations(request.userId);
   }
