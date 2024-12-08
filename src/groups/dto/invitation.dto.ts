@@ -1,10 +1,18 @@
-import { IsNumber } from "class-validator"
+import { Expose, Type } from "class-transformer";
+import { UserDto } from "src/auth/dto/user.dto";
+import { GroupShortDto } from "./group-short.dto";
+import { Timestamp } from "typeorm";
+import { MembershipState } from "../entity/membership-state.enum";
 
 export class InvitationDto {
-    
-    @IsNumber()
-    userId: number
 
-    @IsNumber()
-    groupId: number
+    @Type(()=> UserDto)
+    @Expose() user: UserDto
+
+    @Type(()=> GroupShortDto)
+    @Expose() group: GroupShortDto
+
+    @Expose() state: MembershipState
+
+    @Expose() createdAt: Timestamp
 }

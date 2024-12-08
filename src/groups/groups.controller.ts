@@ -3,7 +3,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { Paginate, PaginateQuery } from 'nestjs-paginate';
-import { InvitationDto } from './dto/invitation.dto';
+import { CreateInvitationDto } from './dto/create-invitation.dto';
 
 @Controller('groups')
 export class GroupsController {
@@ -37,12 +37,6 @@ export class GroupsController {
 
 
 
-  @Post('members')
-  @UseGuards(AuthGuard)
-  addMember(@Body() invitationDto: InvitationDto, @Req() request){
-    return this.groupService.invite(invitationDto, request.userId);
-  }
-
 
   @Get('involved')
   @UseGuards(AuthGuard)
@@ -55,6 +49,19 @@ export class GroupsController {
   findOne(@Param('id') id: string) {
     return "find id: " + id;
   }
+
+
+
+  @Post('members')
+  @UseGuards(AuthGuard)
+  addMember(@Body() invitationDto: CreateInvitationDto, @Req() request){
+    return this.groupService.invite(invitationDto, request.userId);
+  }
+
+
+
+
+
 
 
 
@@ -76,8 +83,8 @@ export class GroupsController {
   }
 
   @Get('members/invitations')
-  findAllMyInvitations() {
-    return "my invitations";
+  findAllMyInvitations(@Req() request) {
+    return this.groupService.findUserInvitations(request.userId);
   }
 
 }

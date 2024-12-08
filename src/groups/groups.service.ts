@@ -1,4 +1,4 @@
-import { InvitationDto } from './dto/invitation.dto';
+import { CreateInvitationDto } from './dto/create-invitation.dto';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { Group } from './entity/group.entity';
@@ -10,6 +10,7 @@ import { plainToInstance } from 'class-transformer';
 import { AuthService } from 'src/auth/auth.service';
 import { GroupMember } from './entity/group-member.entity';
 import { MembershipState } from './entity/membership-state.enum';
+import { InvitationDto } from './dto/invitation.dto';
 
 @Injectable()
 export class GroupsService {
@@ -41,7 +42,10 @@ export class GroupsService {
   async deleteGroup(id: number, ownerId: number) {
     const group: Group = await this.getGroupAndCheckPermission(id, ownerId);
 
-    // TODO: check for members
+    if(await this.groupMemberRepository.existsBy({groupId: id, state: In([MembershipState.ACCEPTED, MembershipState.INVITED])})) {
+        throw new BadRequestException(`There are active members in this group`);
+    }
+
     this.groupRepository.delete(group);
   }
 
@@ -80,7 +84,7 @@ export class GroupsService {
 //   }
 
 
-    async invite(invitationDto: InvitationDto, ownerId: number) {
+    async invite(invitationDto: CreateInvitationDto, ownerId: number) {
         const group: Group = await this.getGroupAndCheckPermission(invitationDto.groupId, ownerId);
         const user = await this.userService.findById(invitationDto.userId);
         
@@ -102,6 +106,23 @@ export class GroupsService {
 
     }
 
+    async findUserInvitations(userId: any) {
+        return await this.groupMemberRepository.find({
+            relations: {
+                user: true,
+                group: {
+                    owner:true
+                }
+            },
+            where: {
+                userId,
+                state: MembershipState.INVITED
+            }
+        }).then(data => data.map(entity =>  plainToInstance(InvitationDto, entity, {excludeExtraneousValues: true}) ))
+    }
+
+
+
 
 
     private async getGroupAndCheckPermission(groupId, userId): Promise<Group> {
@@ -114,7 +135,6 @@ export class GroupsService {
         if(userId !== group.ownerId) {
             throw new BadRequestException(`You are not an owner of this group`);
         }
-
 
         return group
     }
