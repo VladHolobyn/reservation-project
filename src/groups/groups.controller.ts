@@ -1,62 +1,85 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { GroupsService } from './groups.service';
+import { CreateGroupDto } from './dto/create-group.dto';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
+import { CreateInvitationDto } from './dto/create-invitation.dto';
 
 @Controller('groups')
 export class GroupsController {
-  constructor() {}
+  constructor(
+    private readonly groupService: GroupsService
+  ) {}
 
   @Post()
-  create() {
-    return "create a group";
-  }
-
-  @Get('managed')
-  findManaged() {
-    return "find all managed groups";
-  }
-
-  @Get('involved')
-  findInvolved() {
-    return "find all involved groups";
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return "find id: " + id;
+  @UseGuards(AuthGuard)
+  create(@Body() createGroupDto: CreateGroupDto, @Req() request) {
+    return this.groupService.createGroup(createGroupDto, request.userId);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string) {
-    return "update id: " + id;
+  @UseGuards(AuthGuard)
+  update(@Param('id') id: number, @Body() createGroupDto: CreateGroupDto, @Req() request) {
+    return this.groupService.updateGroup(id, createGroupDto, request.userId);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return "delete id: " + id;
+  @UseGuards(AuthGuard)
+  remove(@Param('id') id: number, @Req() request) {
+    return this.groupService.deleteGroup(id, request.userId);
   }
+
+  @Get()
+  @UseGuards(AuthGuard)
+  getAll(@Paginate() query: PaginateQuery) {
+    return this.groupService.findAll(query);
+  }
+
+
+
+
+  @Get('involved')
+  @UseGuards(AuthGuard)
+  findInvolved(@Paginate() query: PaginateQuery, @Req() request) {
+    return this.groupService.findEnrolledGroups(query, request.userId);
+  }
+
+  @Get(':id')
+  @UseGuards(AuthGuard)
+  findOne(@Param('id') id: number, @Req() request) {
+    return this.groupService.findById(id, request.userId);
+  }
+
+
 
   @Post('members')
-  addMember(){
-    return "add member to the group";
-  }
-
-  @Delete('members')
-  deleteMember(@Param('id') id:string) {
-    return "delete member: "+id;
+  @UseGuards(AuthGuard)
+  addMember(@Body() invitationDto: CreateInvitationDto, @Req() request){
+    return this.groupService.invite(invitationDto, request.userId);
   }
 
   @Post('members/:id/approve')
-  approveInvitation(@Param('id') id:string) {
-    return "approved "+id;
+  @UseGuards(AuthGuard)
+  approveInvitation(@Param('id') id: number, @Req() request) {
+    return this.groupService.acceptInvitation(id, request.userId);
   }
 
   @Post('members/:id/disapprove')
-  disapproveInvitation(@Param('id') id:string) {
-    return "disapproved "+id;
+  @UseGuards(AuthGuard)
+  disapproveInvitation(@Param('id') id: number, @Req() request) {
+    return this.groupService.declineInvitation(id, request.userId);
+  }
+
+  @Delete('members/:id')
+  @UseGuards(AuthGuard)
+  deleteMember(@Param('id') id: number, @Req() request) {
+    return this.groupService.deleteMember(id, request.userId);
   }
 
   @Get('members/invitations')
-  findAllMyInvitations() {
-    return "my invitations";
+  @UseGuards(AuthGuard)
+  findAllMyInvitations(@Req() request) {
+    return this.groupService.findUserInvitations(request.userId);
   }
 
 }
