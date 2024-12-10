@@ -25,7 +25,7 @@ export class SlotsService {
     
 
     async createSlot(createSlotDto: CreateSlotDto, userId: number) {
-        await this.validateSlot(createSlotDto, userId, null);
+        await this.validateSlot(createSlotDto, userId);
         await this.slotRepository.save({...createSlotDto, ownerId: userId})
     }
 
@@ -37,7 +37,7 @@ export class SlotsService {
         }
 
         const newSlot: Slot = Object.assign(slot, updateSlotDto); 
-        await this.validateSlot(newSlot, userId, id);
+        await this.validateSlot(newSlot, userId);
 
         await this.slotRepository.update({id}, newSlot)
     }
@@ -52,7 +52,6 @@ export class SlotsService {
         }
 
         await this.slotRepository.remove(slot);
-
       }
 
     async publishSlot(id: number, userId: any) {
@@ -77,7 +76,7 @@ export class SlotsService {
         await this.slotRepository.update({id}, slot)
     }
 
-    async findAll(query: PaginateQuery, userId: number) {
+    async getAll(query: PaginateQuery, userId: number) {
 
         const pagable = await paginate(query, this.slotRepository, {
             sortableColumns: ['id'],
@@ -88,11 +87,7 @@ export class SlotsService {
               reserverId: [FilterOperator.EQ],
               groupId: [FilterOperator.EQ],
             },
-            relations: {
-                group: {
-                    members: true
-                }
-            },
+            relations: { group: { members: true } },
             where: [
                 {ownerId: userId},
                 {group: {members: {userId}}, state: In([SlotState.AVAILABLE, SlotState.RESERVED])}
@@ -102,9 +97,7 @@ export class SlotsService {
         return {
           ...pagable,
           data: pagable.data.map((entity) =>
-            plainToInstance(SlotDto, entity, {
-                excludeExtraneousValues: true,
-              })
+            plainToInstance(SlotDto, entity, { excludeExtraneousValues: true})
           ),
         };
     }
@@ -149,10 +142,7 @@ export class SlotsService {
         return  slot;
     }
 
-
-
-
-    private async validateSlot(requestDto: Partial<Slot>, userId: number, slotId: number) {
+    private async validateSlot(requestDto: Partial<Slot>, userId: number) {
         await this.groupService.getGroupAndCheckPermission(requestDto.groupId, userId);
 
         const startDate = new Date(requestDto.startDate);
@@ -162,7 +152,7 @@ export class SlotsService {
             throw new BadRequestException('End date is before the Start date');
         }
 
-        if(await this.overlapsWithOthers(startDate, endDate, userId, slotId)) {
+        if(await this.overlapsWithOthers(startDate, endDate, userId, requestDto?.id)) {
             throw new BadRequestException('This time is scheduled');
         }
 
@@ -171,7 +161,7 @@ export class SlotsService {
         }
     }
 
-    private async overlapsWithOthers(startDate, endDate, userId, slotId): Promise<boolean> {
+    private async overlapsWithOthers(startDate, endDate, userId, slotId: number | null | undefined): Promise<boolean> {
         let query = this.slotRepository.createQueryBuilder('slot')
         .where(new Brackets(qb => {
             qb.where(
@@ -187,13 +177,12 @@ export class SlotsService {
                 }),
               )
         }))
-          .andWhere(':ownerId = slot.ownerId');
+        .andWhere(':ownerId = slot.ownerId');
 
         if(slotId) {
             query = query.andWhere('slot.id != :slotId')
         }
 
-        return await query
-          .setParameters({ startDate, endDate, ownerId: userId, ...(slotId && { slotId })}).getExists();
+        return await query.setParameters({ startDate, endDate, ownerId: userId, ...(slotId && { slotId })}).getExists();
     }
 }

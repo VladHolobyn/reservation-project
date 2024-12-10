@@ -17,7 +17,7 @@ export class SlotsController {
   @Get()
   @UseGuards(AuthGuard)
   findAll(@Paginate() query: PaginateQuery, @Req() request) {
-    return this.slotService.findAll(query, request.userId);
+    return this.slotService.getAll(query, request.userId);
   }
 
   @Post()
