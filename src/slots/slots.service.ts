@@ -39,6 +39,20 @@ export class SlotsService {
         await this.slotRepository.update({id}, newSlot)
     }
 
+    async deleteSlot(id: number, userId: number) {
+        const slot: Slot = await this.findById(id);
+
+        await this.groupService.getGroupAndCheckPermission(slot.groupId, userId);
+
+        if (![SlotState.AVAILABLE, SlotState.DRAFT].includes(slot.state)) {
+            throw new BadRequestException('Slot cannot be deleted in this state');
+        }
+
+        await this.slotRepository.remove(slot);
+
+      }
+
+
     async findById(id: number) {
         const slot: Slot = await this.slotRepository.findOneBy({id});
 

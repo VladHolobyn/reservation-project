@@ -30,8 +30,8 @@ export class SlotsController {
 
   @Delete(':id')
   @UseGuards(AuthGuard)
-  remove(@Param('id') id: string) {
-    return "delete slot: " + id;
+  remove(@Param('id') id: number, @Req() request) {
+    return this.slotService.deleteSlot(id, request.userId);
   }
 
   @Post(':id/publish')
