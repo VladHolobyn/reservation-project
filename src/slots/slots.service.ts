@@ -1,12 +1,15 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Slot } from './entity/slot.entity';
-import { Brackets, Repository } from 'typeorm';
+import { Brackets, In, Repository } from 'typeorm';
 import { UpdateSlotDto } from './dto/update-slot.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { GroupsService } from 'src/groups/groups.service';
 import { SlotState } from './entity/slot-state.enum';
 import { CreateSlotDto } from './dto/create-slot.dto';
+import { FilterOperator, paginate, PaginateQuery } from 'nestjs-paginate';
+import { SlotDto } from './dto/slot.dto';
+import { plainToInstance } from 'class-transformer';
 
 
 @Injectable()
@@ -73,6 +76,40 @@ export class SlotsService {
         slot.state = state;
         await this.slotRepository.update({id}, slot)
     }
+
+    async findAll(query: PaginateQuery, userId: number) {
+
+        const pagable = await paginate(query, this.slotRepository, {
+            sortableColumns: ['id'],
+            searchableColumns: ['startDate', 'state', 'reserverId', 'groupId'],
+            filterableColumns: {
+              startDate: [FilterOperator.LTE, FilterOperator.GTE],
+              state: [FilterOperator.EQ],
+              reserverId: [FilterOperator.EQ],
+              groupId: [FilterOperator.EQ],
+            },
+            relations: {
+                group: {
+                    members: true
+                }
+            },
+            where: [
+                {ownerId: userId},
+                {group: {members: {userId}}, state: In([SlotState.AVAILABLE, SlotState.RESERVED])}
+            ]
+          });
+    
+        return {
+          ...pagable,
+          data: pagable.data.map((entity) =>
+            plainToInstance(SlotDto, entity, {
+                excludeExtraneousValues: true,
+              })
+          ),
+        };
+    }
+
+
 
     async findById(id: number) {
         const slot: Slot = await this.slotRepository.findOneBy({id});

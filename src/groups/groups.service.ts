@@ -189,6 +189,9 @@ export class GroupsService {
     }
 
 
+    async iSOwner(groupId, userId): Promise<boolean>{
+      return await this.groupRepository.existsBy({id: groupId, ownerId: userId});
+    }
 
     async getGroupAndCheckPermission(groupId, userId): Promise<Group> {
         const group: Group = await this.groupRepository.findOneBy({ id: groupId });

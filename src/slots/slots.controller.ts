@@ -4,17 +4,20 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { UpdateSlotDto } from './dto/update-slot.dto';
 import { CreateSlotDto } from './dto/create-slot.dto';
 import { SlotState } from './entity/slot-state.enum';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
 
 @Controller('slots')
 export class SlotsController {
-    constructor(
-      private readonly slotService: SlotsService
-    ) {}
+
+  constructor(
+    private readonly slotService: SlotsService
+  ) {}
+
 
   @Get()
   @UseGuards(AuthGuard)
-  findAll() {
-    return "find all slots";
+  findAll(@Paginate() query: PaginateQuery, @Req() request) {
+    return this.slotService.findAll(query, request.userId);
   }
 
   @Post()
