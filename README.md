@@ -4,12 +4,21 @@
 
 
 ## Description
+
+The project is a web application where users can create and manage groups, post available time slots for events or activities, and allow group members to reserve or cancel these slots.
 Database: Postgres
+
+*Functional Requirements*: <a href="https://github.com/VladHolobyn/reservation-project/issues/1">#1</a>
+*ERD*: <a href="https://github.com/VladHolobyn/reservation-project/issues/2">#2</a>
+*Postman Collection*: <a href="https://github.com/VladHolobyn/reservation-project/blob/master/src/postman/NestJS.postman_collection.json">#3</a>
+
+
+
 
 ## Project setup
 
 ```bash
-$ npm install
+npm install
 ```
 
 Define environment variables in _.env_ file
@@ -18,42 +27,17 @@ Define environment variables in _.env_ file
 - DB_NAME
 - DB_USER
 - DB_PASSWORD
+- JWT_SECRET
 
 ## Compile and run the project
 
 ```bash
 # development
-$ npm run start
+npm run start
 
 # watch mode
-$ npm run start:dev
+npm run start:dev
 
 # production mode
-$ npm run start:prod
+npm run start:prod
 ```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
