@@ -8,9 +8,9 @@
 The project is a web application where users can create and manage groups, post available time slots for events or activities, and allow group members to reserve or cancel these slots.
 Database: Postgres
 
-*Functional Requirements*: <a href="https://github.com/VladHolobyn/reservation-project/issues/1">#1</a>
-*ERD*: <a href="https://github.com/VladHolobyn/reservation-project/issues/2">#2</a>
-*Postman Collection*: <a href="https://github.com/VladHolobyn/reservation-project/blob/master/src/postman/NestJS.postman_collection.json">#3</a>
+<div> <i>Functional Requirements</i>: <a href="https://github.com/VladHolobyn/reservation-project/issues/1">#1</a> </div>
+<div><i>ERD</i>: <a href="https://github.com/VladHolobyn/reservation-project/issues/2">#2</a></div>
+<div><i>Postman Collection</i>: <a href="https://github.com/VladHolobyn/reservation-project/blob/master/src/postman/NestJS.postman_collection.json">#3</a></div>
 
 
 
