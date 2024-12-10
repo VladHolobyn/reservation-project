@@ -109,6 +109,34 @@ export class SlotsService {
         };
     }
 
+    async reserveSlot(id: number, userId: number) {
+        const slot: Slot = await this.findById(id);
+
+        if (slot.state !==  SlotState.AVAILABLE) {
+            throw new BadRequestException('Only the AVAILABLE slot can be reserved');
+        }
+
+        if (!await this.groupService.isMember(slot.groupId, userId)) {
+            throw new BadRequestException('You are not a member');
+        }
+
+        slot.reserverId = userId;
+        slot.state = SlotState.RESERVED;
+        await this.slotRepository.update({id}, slot)
+    }
+
+    async cancelSlot(id: number, userId: number) {
+        const slot: Slot = await this.findById(id);
+
+        if (slot.state !==  SlotState.RESERVED || slot.reserverId !== userId) {
+            throw new BadRequestException('Only the RESERVED slot can be reserved');
+        }
+
+        slot.reserverId = null;
+        slot.state = SlotState.AVAILABLE;
+        await this.slotRepository.update({id}, slot)
+    }
+
 
 
     async findById(id: number) {

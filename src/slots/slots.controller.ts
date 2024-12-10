@@ -52,14 +52,14 @@ export class SlotsController {
 
   @Post(':id/reserve')
   @UseGuards(AuthGuard)
-  reserve() {
-    return "reserve a slot";
+  reserve(@Param('id') id: number, @Req() request) {
+    return this.slotService.reserveSlot(id, request.userId)
   }
 
   @Post(':id/cancel')
   @UseGuards(AuthGuard)
-  cancel() {
-    return "cancel a slot";
+  cancel(@Param('id') id: number, @Req() request) {
+    return this.slotService.cancelSlot(id, request.userId)
   }
 
 }
