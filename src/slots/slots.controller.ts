@@ -1,57 +1,65 @@
-import { Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { SlotsService } from './slots.service';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { UpdateSlotDto } from './dto/update-slot.dto';
+import { CreateSlotDto } from './dto/create-slot.dto';
+import { SlotState } from './entity/slot-state.enum';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
 
 @Controller('slots')
 export class SlotsController {
-    constructor() {}
+
+  constructor(
+    private readonly slotService: SlotsService
+  ) {}
+
 
   @Get()
-  findAll() {
-    return "find all slots";
-  }
-
-  @Get('available')
-  findAvailable() {
-    return "available slots";
+  @UseGuards(AuthGuard)
+  findAll(@Paginate() query: PaginateQuery, @Req() request) {
+    return this.slotService.findAll(query, request.userId);
   }
 
   @Post()
-  create() {
-    return "create a slot";
+  @UseGuards(AuthGuard)
+  create(@Body() createSlotDto: CreateSlotDto, @Req() request) {
+    return this.slotService.createSlot(createSlotDto, request.userId);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string) {
-    return "update slot: " + id;
+  @UseGuards(AuthGuard)
+  update(@Param('id') id: number, @Body() updateSlotDto: UpdateSlotDto, @Req() request) {
+    return this.slotService.updateSlot(id, updateSlotDto, request.userId);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return "delete slot: " + id;
+  @UseGuards(AuthGuard)
+  remove(@Param('id') id: number, @Req() request) {
+    return this.slotService.deleteSlot(id, request.userId);
   }
 
   @Post(':id/publish')
-  publish() {
-    return "publish a slot";
+  @UseGuards(AuthGuard)
+  publish(@Param('id') id: number, @Req() request) {
+    return this.slotService.publishSlot(id, request.userId);
   }
 
-  @Post(':id/complete')
-  complete() {
-    return "complete a slot";
-  }
-
-  @Post(':id/miss')
-  miss() {
-    return "miss a slot";
+  @Patch(':id/end-state')
+  @UseGuards(AuthGuard)
+  mark(@Param('id') id: number,@Body() stateDto: {state: SlotState}, @Req() request) {
+    return this.slotService.markSlotAs(id, stateDto.state, request.userId)
   }
 
   @Post(':id/reserve')
-  reserve() {
-    return "reserve a slot";
+  @UseGuards(AuthGuard)
+  reserve(@Param('id') id: number, @Req() request) {
+    return this.slotService.reserveSlot(id, request.userId)
   }
 
   @Post(':id/cancel')
-  cancel() {
-    return "cancel a slot";
+  @UseGuards(AuthGuard)
+  cancel(@Param('id') id: number, @Req() request) {
+    return this.slotService.cancelSlot(id, request.userId)
   }
 
 }

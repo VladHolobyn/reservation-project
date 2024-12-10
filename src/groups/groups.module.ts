@@ -12,6 +12,7 @@ import { GroupMember } from './entity/group-member.entity';
     AuthModule,
     TypeOrmModule.forFeature([Group, GroupMember])
   ],
-  providers: [GroupsService]
+  providers: [GroupsService],
+  exports: [GroupsService]
 })
 export class GroupsModule {}

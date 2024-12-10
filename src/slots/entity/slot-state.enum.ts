@@ -1,0 +1,3 @@
+export enum SlotState {
+    DRAFT, AVAILABLE, RESERVED, COMPLETED, MISSED, UNUSED
+}
