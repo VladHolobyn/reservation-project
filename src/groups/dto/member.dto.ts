@@ -5,6 +5,8 @@ import { Timestamp } from "typeorm";
 
 export class MemberDto {
 
+    @Expose() id: number
+
     @Type(()=> UserDto)
     @Expose() user: UserDto
 

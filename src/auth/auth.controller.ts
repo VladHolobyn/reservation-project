@@ -3,12 +3,14 @@ import { AuthService } from './auth.service';
 import { RegistrationDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from './guards/auth.guard';
+import { UsersService } from './users.service';
 
 @Controller('auth')
 export class AuthController {
 
     constructor(
-        private readonly authService: AuthService
+        private readonly authService: AuthService,
+        private readonly userService: UsersService
     ) {}    
 
     @Post('register')
@@ -23,8 +25,7 @@ export class AuthController {
 
     @Get('users/:id')
     @UseGuards(AuthGuard)
-    findOne(@Param('id') id:string, @Req() request) {
-        Logger.debug(request.userId);
-        return this.authService.findById(+id);
+    getById(@Param('id') id:number) {
+        return this.userService.getById(id);
     }
 }

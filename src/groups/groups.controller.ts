@@ -7,9 +7,11 @@ import { CreateInvitationDto } from './dto/create-invitation.dto';
 
 @Controller('groups')
 export class GroupsController {
+
   constructor(
     private readonly groupService: GroupsService
   ) {}
+
 
   @Post()
   @UseGuards(AuthGuard)
@@ -32,22 +34,20 @@ export class GroupsController {
   @Get()
   @UseGuards(AuthGuard)
   getAll(@Paginate() query: PaginateQuery) {
-    return this.groupService.findAll(query);
+    return this.groupService.getAll(query);
   }
 
 
-
-
-  @Get('involved')
+  @Get('/involved/')
   @UseGuards(AuthGuard)
   findInvolved(@Paginate() query: PaginateQuery, @Req() request) {
-    return this.groupService.findEnrolledGroups(query, request.userId);
+    return this.groupService.getEnrolledGroups(query, request.userId);
   }
-
+  
   @Get(':id')
   @UseGuards(AuthGuard)
   findOne(@Param('id') id: number, @Req() request) {
-    return this.groupService.findById(id, request.userId);
+    return this.groupService.gettById(id, request.userId);
   }
 
 
@@ -79,7 +79,7 @@ export class GroupsController {
   @Get('members/invitations')
   @UseGuards(AuthGuard)
   findAllMyInvitations(@Req() request) {
-    return this.groupService.findUserInvitations(request.userId);
+    return this.groupService.getUserInvitations(request.userId);
   }
 
 }

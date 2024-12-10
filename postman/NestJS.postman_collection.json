@@ -1,0 +1,636 @@
+{
+	"info": {
+		"_postman_id": "558c76fe-698c-4a43-a388-8ce5206cf670",
+		"name": "NestJS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26102569"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "SingUp",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"test@pnu.edu.ua\",\r\n    \"firstName\": \"Test\",\r\n    \"lastName\": \"User\",\r\n    \"password\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/auth/register",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"test@pnu.edu.ua\",\r\n    \"password\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/auth/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/auth/users/3",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Groups",
+			"item": [
+				{
+					"name": "Create New Group",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Third Group\",\r\n    \"description\": \"-\"   \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/groups",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Group",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Third Group (#3)\",\r\n    \"description\": \"-\"   \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/groups/5",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Group By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/groups/4",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Group",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/groups/5",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filtered Group List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/groups?page=1&filter.ownerId=4",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "filter.name",
+									"value": "$ilike:fi",
+									"disabled": true
+								},
+								{
+									"key": "filter.ownerId",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invite New Member",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\": 5,\r\n    \"groupId\": 4\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/groups/members",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Group Member",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/groups/members/5",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups",
+								"members",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find My Invitations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/groups/members/invitations",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups",
+								"members",
+								"invitations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Accept Invitation",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/groups/members/5/approve",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups",
+								"members",
+								"5",
+								"approve"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Decline Invitation",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/groups/members/5/disapprove",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups",
+								"members",
+								"5",
+								"disapprove"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Enrolled Groups",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/groups/involved",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups",
+								"involved"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Slots",
+			"item": [
+				{
+					"name": "FIltered Slots",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/slots",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"slots"
+							],
+							"query": [
+								{
+									"key": "filter.state",
+									"value": "4",
+									"disabled": true
+								},
+								{
+									"key": "filter.groupId",
+									"value": "3",
+									"disabled": true
+								},
+								{
+									"key": "filter.reserverId",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "filter.startDate",
+									"value": "$gte:2024-12-20",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Slot",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"startDate\": \"2024-12-20 13:25:00\",\r\n    \"endDate\": \"2024-12-20 19:15:00\",\r\n    \"groupId\": 4\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/slots",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"slots"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Slot",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"startDate\": \"2024-12-20 14:05:00\",\r\n    \"endDate\": \"2024-12-20 14:35:00\"\r\n    // \"groupId\": 2\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/slots/14",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"slots",
+								"14"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Slot",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/slots/3",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"slots",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Publish Slot",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/slots/3/publish",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"slots",
+								"3",
+								"publish"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Slot As",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"state\": 4\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/slots/4/end-state",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"slots",
+								"4",
+								"end-state"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reserve Slot",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/slots/2/reserve",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"slots",
+								"2",
+								"reserve"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Slot",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/slots/2/cancel",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"slots",
+								"2",
+								"cancel"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "jwt",
+		"jwt": [
+			{
+				"key": "payload",
+				"value": "{\r\n    \"userId\": 4,\r\n    \"iat\": 1733581051,\r\n    \"exp\": 1736256612\r\n}",
+				"type": "string"
+			},
+			{
+				"key": "secret",
+				"value": "{{JWT_SECRET}}",
+				"type": "string"
+			},
+			{
+				"key": "header",
+				"value": "{\r\n    \"typ\": \"JWT\"\r\n}",
+				"type": "string"
+			},
+			{
+				"key": "isSecretBase64Encoded",
+				"value": false,
+				"type": "boolean"
+			},
+			{
+				"key": "algorithm",
+				"value": "HS256",
+				"type": "string"
+			},
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			},
+			{
+				"key": "headerPrefix",
+				"value": "Bearer",
+				"type": "string"
+			},
+			{
+				"key": "queryParamKey",
+				"value": "token",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "http://127.0.0.1:3000\n",
+			"type": "string"
+		},
+		{
+			"key": "JWT_SECRET",
+			"value": "2jmfJ3Fwjf342FD2ffw!wg3",
+			"type": "string"
+		}
+	]
+}
