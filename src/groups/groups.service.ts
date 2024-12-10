@@ -3,15 +3,15 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateGroupDto } from './dto/create-group.dto';
 import { Group } from './entity/group.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ArrayContains, In, Repository } from 'typeorm';
-import { FilterOperator, paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
+import { In, Repository } from 'typeorm';
+import { FilterOperator, paginate, PaginateQuery } from 'nestjs-paginate';
 import { GroupShortDto } from './dto/group-short.dto';
 import { plainToInstance } from 'class-transformer';
-import { AuthService } from 'src/auth/auth.service';
 import { GroupMember } from './entity/group-member.entity';
 import { MembershipState } from './entity/membership-state.enum';
 import { InvitationDto } from './dto/invitation.dto';
 import { GroupFullDto } from './dto/group-full.dto';
+import { UsersService } from 'src/auth/users.service';
 
 @Injectable()
 export class GroupsService {
@@ -22,7 +22,7 @@ export class GroupsService {
     @InjectRepository(GroupMember)
     private readonly groupMemberRepository: Repository<GroupMember>,
 
-    private readonly userService: AuthService
+    private readonly userService: UsersService
   ) {}
 
 
