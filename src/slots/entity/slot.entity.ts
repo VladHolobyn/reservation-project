@@ -9,10 +9,10 @@ export class Slot {
     id: number
 
     @Column({ type: 'timestamptz' })
-    startDate: Timestamp
+    startDate: Date
 
     @Column({ type: 'timestamptz' })
-    endDate: Timestamp
+    endDate: Date
 
     @Column({
         type: "enum",
@@ -32,7 +32,7 @@ export class Slot {
 
     @Column({nullable: true})
     reserverId: number | null
-    
+
     @ManyToOne(()=>User, (table) => table.id, {nullable: true})
     @JoinColumn()
     reserver?: User | null

@@ -1,7 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { SlotsService } from './slots.service';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { RequestSlotDto } from './dto/request-slot.dto';
+import { UpdateSlotDto } from './dto/update-slot.dto';
+import { CreateSlotDto } from './dto/create-slot.dto';
 
 @Controller('slots')
 export class SlotsController {
@@ -17,14 +18,14 @@ export class SlotsController {
 
   @Post()
   @UseGuards(AuthGuard)
-  create(@Body() createSlotDto: RequestSlotDto, @Req() request) {
+  create(@Body() createSlotDto: CreateSlotDto, @Req() request) {
     return this.slotService.createSlot(createSlotDto, request.userId);
   }
 
   @Patch(':id')
   @UseGuards(AuthGuard)
-  update(@Param('id') id: string) {
-    return "update slot: " + id;
+  update(@Param('id') id: number, @Body() updateSlotDto: UpdateSlotDto, @Req() request) {
+    return this.slotService.updateSlot(id, updateSlotDto, request.userId);
   }
 
   @Delete(':id')

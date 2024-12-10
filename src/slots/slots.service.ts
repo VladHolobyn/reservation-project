@@ -1,15 +1,17 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Slot } from './entity/slot.entity';
-import { Between, Repository } from 'typeorm';
-import { RequestSlotDto } from './dto/request-slot.dto';
+import { Brackets, Repository } from 'typeorm';
+import { UpdateSlotDto } from './dto/update-slot.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { GroupsService } from 'src/groups/groups.service';
-import { Group } from 'src/groups/entity/group.entity';
+import { SlotState } from './entity/slot-state.enum';
+import { CreateSlotDto } from './dto/create-slot.dto';
 
 
 @Injectable()
 export class SlotsService {
+
     constructor (
         @InjectRepository(Slot)
         private readonly slotRepository: Repository<Slot>,
@@ -19,30 +21,79 @@ export class SlotsService {
     ) {}
     
 
-    async createSlot(createSlotDto: RequestSlotDto, userId: number) {
-        const group: Group = await this.groupService.getGroupAndCheckPermission(createSlotDto.groupId, userId);
-        
-        if(createSlotDto.startDate > createSlotDto.endDate) {
-            throw new BadRequestException('End date is before the Start date');
-        }
-
-        if(await this.overlapsWithOthers(createSlotDto.startDate, createSlotDto.endDate, userId)) {
-            throw new BadRequestException('This time is scheduled');
-        }
-
-        if(createSlotDto.reserverId) {
-            await this.userService.findById(createSlotDto.reserverId)
-        }
-
+    async createSlot(createSlotDto: CreateSlotDto, userId: number) {
+        await this.validateSlot(createSlotDto, userId, null);
         await this.slotRepository.save({...createSlotDto, ownerId: userId})
     }
 
-    private async overlapsWithOthers(startDate, endDate, userId): Promise<boolean> {
-        return await this.slotRepository.exists({
-            where: [
-                {startDate: Between(startDate, endDate), ownerId: userId},
-                {endDate: Between(startDate, endDate), ownerId: userId},
-            ]
-        })
+    async updateSlot(id: number, updateSlotDto: UpdateSlotDto, userId: number) {
+        const slot: Slot = await this.findById(id);
+
+        if (![SlotState.AVAILABLE, SlotState.DRAFT].includes(slot.state)) {
+            throw new BadRequestException('Slot cannot be updated in this state');
+        }
+
+        const newSlot: Slot = Object.assign(slot, updateSlotDto); 
+        await this.validateSlot(newSlot, userId, id);
+
+        await this.slotRepository.update({id}, newSlot)
+    }
+
+    async findById(id: number) {
+        const slot: Slot = await this.slotRepository.findOneBy({id});
+
+        if (!slot) {
+            throw new NotFoundException(`Slot with id: ${id} does not exist`);
+        }
+
+        return  slot;
+    }
+
+
+
+
+    private async validateSlot(requestDto: Partial<Slot>, userId: number, slotId: number) {
+        await this.groupService.getGroupAndCheckPermission(requestDto.groupId, userId);
+
+        const startDate = new Date(requestDto.startDate);
+        const endDate = new Date(requestDto.endDate)
+
+        if(startDate > endDate) {
+            throw new BadRequestException('End date is before the Start date');
+        }
+
+        if(await this.overlapsWithOthers(startDate, endDate, userId, slotId)) {
+            throw new BadRequestException('This time is scheduled');
+        }
+
+        if(requestDto.reserverId) {
+            await this.userService.findById(requestDto.reserverId)
+        }
+    }
+
+    private async overlapsWithOthers(startDate, endDate, userId, slotId): Promise<boolean> {
+        let query = this.slotRepository.createQueryBuilder('slot')
+        .where(new Brackets(qb => {
+            qb.where(
+                new Brackets((qb) => {
+                  qb.where(':startDate BETWEEN slot.startDate AND slot.endDate')
+                    .orWhere(':endDate BETWEEN slot.startDate AND slot.endDate');
+                }),
+              )
+              .orWhere(
+                new Brackets((qb) => {
+                  qb.where('slot.startDate BETWEEN :startDate AND :endDate')
+                    .orWhere('slot.endDate BETWEEN :startDate AND :endDate');
+                }),
+              )
+        }))
+          .andWhere(':ownerId = slot.ownerId');
+
+        if(slotId) {
+            query = query.andWhere('slot.id != :slotId')
+        }
+
+        return await query
+          .setParameters({ startDate, endDate, ownerId: userId, ...(slotId && { slotId })}).getExists();
     }
 }
