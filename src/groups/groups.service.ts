@@ -190,7 +190,7 @@ export class GroupsService {
 
 
 
-    private async getGroupAndCheckPermission(groupId, userId): Promise<Group> {
+    async getGroupAndCheckPermission(groupId, userId): Promise<Group> {
         const group: Group = await this.groupRepository.findOneBy({ id: groupId });
 
         if(!group) {

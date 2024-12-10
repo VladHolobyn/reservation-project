@@ -1,8 +1,10 @@
 import { Expose, instanceToInstance, plainToInstance, Transform, Type } from "class-transformer";
 import { UserDto } from "src/auth/dto/user.dto";
 
-export class GroupShortDto {    
-    
+export class GroupShortDto {
+
+    @Expose()id: number
+
     @Expose()name: string
     
     @Expose() description: string
