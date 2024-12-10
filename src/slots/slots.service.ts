@@ -52,6 +52,27 @@ export class SlotsService {
 
       }
 
+    async publishSlot(id: number, userId: any) {
+        const slot: Slot = await this.findById(id);
+
+        await this.groupService.getGroupAndCheckPermission(slot.groupId, userId);
+
+        if (slot.state !==  SlotState.DRAFT) {
+            throw new BadRequestException('Only the DRAFT slot can be published');
+        }
+
+        slot.state = SlotState.AVAILABLE;
+        await this.slotRepository.update({id}, slot)
+    }      
+
+    async markSlotAs(id: number, state: SlotState, userId: any) {
+        const slot: Slot = await this.findById(id);
+
+        await this.groupService.getGroupAndCheckPermission(slot.groupId, userId);
+
+        slot.state = state;
+        await this.slotRepository.update({id}, slot)
+    }
 
     async findById(id: number) {
         const slot: Slot = await this.slotRepository.findOneBy({id});

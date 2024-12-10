@@ -3,6 +3,7 @@ import { SlotsService } from './slots.service';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { UpdateSlotDto } from './dto/update-slot.dto';
 import { CreateSlotDto } from './dto/create-slot.dto';
+import { SlotState } from './entity/slot-state.enum';
 
 @Controller('slots')
 export class SlotsController {
@@ -36,14 +37,14 @@ export class SlotsController {
 
   @Post(':id/publish')
   @UseGuards(AuthGuard)
-  publish() {
-    return "publish a slot";
+  publish(@Param('id') id: number, @Req() request) {
+    return this.slotService.publishSlot(id, request.userId);
   }
 
-  @Patch(':id/end-status')
+  @Patch(':id/end-state')
   @UseGuards(AuthGuard)
-  mark() {
-    return "complete a slot";
+  mark(@Param('id') id: number,@Body() stateDto: {state: SlotState}, @Req() request) {
+    return this.slotService.markSlotAs(id, stateDto.state, request.userId)
   }
 
   @Post(':id/reserve')
